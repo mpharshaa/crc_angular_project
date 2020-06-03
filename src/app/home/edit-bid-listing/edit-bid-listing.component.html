@@ -1,0 +1,1009 @@
+<div *ngIf="VendorOfferBids.length == 0 && areVendorOfferBidsAvailable==false && errorMessage == false"
+  style="font-weight:bold;padding:20px ;">{{this.loadingText}}</div>
+
+
+<div *ngIf="areVendorOfferBidsAvailable" style="font-weight:bold;padding:20px ;">
+  {{this.noBidsAvailableError}}
+</div>
+
+
+<div *ngIf="errorMessage==true" style="font-weight:bold;padding:20px ;">{{this.message}}</div>
+
+
+
+
+
+
+
+<div class="table-responsive text-center" *ngIf="VendorOfferBids.length !== 0">
+  <h3 style="color:#2684c0">My Bids</h3><br />
+  <mat-form-field>
+
+    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+
+  </mat-form-field>
+  <mat-icon>search</mat-icon>
+
+
+
+
+  <div class="mat-elevation-z8" *ngIf="dataSource?.filteredData.length > 0" style="margin:20px auto;width:75%;">
+
+
+      <table mat-table [dataSource]="dataSource" matSort matSortActive="bidCloseDate" matSortDirection="desc"
+        matSortDisableClear>
+        <ng-container matColumnDef="bidNumber">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header><strong>Bid Number</strong></th>
+          <td mat-cell *matCellDef="let myBids" style="text-align: left !important">{{myBids.bidNumber}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="orgName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header><strong>Org Name</strong> </th>
+          <td mat-cell *matCellDef="let myBids" style="text-align: left !important"> {{myBids.orgName}} </td>
+        </ng-container>
+        <ng-container matColumnDef="bidCloseDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header><strong>Bid Close Date</strong></th>
+          <td mat-cell *matCellDef="let myBids" style="text-align: left !important">
+            {{myBids.bidCloseDate | date: 'MM/dd/yyyy'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="details">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header><strong> Details </strong></th>
+          <td mat-cell *matCellDef="let myBids" style="text-align: left !important">
+            <button mat-icon-button color="primary" (click)="getBidForm(myBids.bidNumber)" data-toggle="modal"
+              data-target="#BidFormViewModal">
+              <mat-icon class="mat-18">reorder</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="offer">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header><strong> Offer</strong> </th>
+          <td mat-cell *matCellDef="let myBids" style="text-align: left !important">
+
+            <button mat-icon-button color="primary"
+              *ngIf="((myBids.bidStatus) == 'Open')" type="button" color="primary"
+              data-toggle="modal" data-target="#myModalEdit" (click)="getBidForm(myBids.bidNumber)" data-toggle="modal"
+              data-target="#BidFormUpdateModal">
+              <mat-icon class="mat-18">border_color</mat-icon>
+            </button>
+            <span *ngIf="((myBids.bidStatus) == 'Closed')">Closed</span>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let myRowData; columns: displayedColumns"></tr>
+      </table>
+
+      <mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 15]">
+      </mat-paginator>
+  </div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--BidForm View  Modal -->
+<div id="BidFormViewModal" class="modal" role="dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" style="max-width:80% !important">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+
+      <div class="modal-body">
+
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+        <div align="left" style="text-align:left;" class="headder">
+          <h5>Bid Offer</h5>
+        </div>
+
+        <div style="width:100%; margin:0 auto;">
+          <div class="pane" *ngIf="this.errorMessageInBidForm == true">
+            <span style="color:#F00;"><strong>ERROR: </strong>{{this.message}}</span>
+          </div>
+
+          <div class="pane">
+            <div class="table-responsive">
+              <form [formGroup]="customerBidForm">
+                <table width="1000" border="0" cellpadding="0" cellspacing="0">
+
+                  <tr>
+                    <th>Org</th>
+                    <td>
+                      <input type="text" name="OrgName" id="OrgName" style="width:130px;" class="form-control"
+                        formControlName="orgName" readonly /></td>
+                    <th>Case #</th>
+                    <td><input type="text" name="Case" id="Case" style="width:130px;" class="form-control"
+                        formControlName="case" readonly /></td>
+                    <th>
+                      <a href="" (click)="getDocumentDetails()" data-toggle="modal" data-target="#ShowPicsModal"
+                        title="Show document details">Pic/Docs</a>
+                    </th>
+
+                    <th style="color:#F00;">Customer Bid</th>
+                    <td><input type="text" name="CustomerBid" id="customerBid" placeholder="Enter Your Bid"
+                        class="form-control" style="width:130px;" formControlName="customerBid" readonly /></td>
+                    <th>UOM</th>
+                    <td><input type="text" name="Uom" id="Uom" style="width:130px;" class="form-control"
+                        formControlName="uom" readonly /></td>
+                  </tr>
+                  <tr>
+                    <td colspan="7"></td>
+                    <!-- <th><span>Highest Bid</span></th>
+                    <td><input type="text" name="HighestBid" id="HighestBid" style="width:130px;" class="form-control"
+                        formControlName="HighestBid" readonly /></td> -->
+                    <th>Customer #</th>
+                    <td><input type="text" name="CustomerNo" id="CustomerNo" style="width:130px;" class="form-control"
+                        formControlName="customerNo" readonly /></td>
+                  </tr>
+                </table>
+              </form>
+            </div>
+          </div>
+
+          <div class="pane2">
+              <div class="table-responsive">
+                <div class="tableFixHead" style="width: 65%">
+                  <form [formGroup]="LLLForm">
+                    <table>
+                      <thead style="background:#eee;">
+                        <tr>
+                          <th>
+                            Location
+                          </th>
+                          <th>
+                            Latitude
+                          </th>
+                          <th>
+                            Longitude
+                          </th>
+                        </tr>
+                      </thead>
+                     
+                      <tbody  style=" overflow-x: hidden;">
+                        <tr *ngFor="let llls of locationDetails">
+                          <td><input type="text" name="location" id="location" class="form-control"
+                              formControlName="location" value="{{llls.Location}}" readonly title="{{llls.Location}}" />
+                          </td>
+                          <td><input type="text" name="Lat" id="Lat" class="form-control" formControlName="Lat"
+                              value="{{llls.Lat}}" readonly title="{{llls.Lat}}" /></td>
+                          <td><input type="text" name="Long" id="Long" class="form-control" formControlName="Long"
+                              value="{{llls.Long}}" readonly title="{{llls.Long}}" /></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+          <div class="pane">
+            <p style="font-weight:bold ;color:#000;">ENVIRONMENTAL CONDITIONS</p>
+            <div class="table-responsive">
+              <table width="99%" border="0">
+                <tr style="border:1px solid #ccc;">
+                  <td colspan="2" rowspan="4" valign="top">
+                    <div style="width:400px;">
+                      <p>Are any of the following materials known
+                        or suspected to be contained
+                        in the equipment described
+                        above?
+                        If yes(Y), please comment</p>
+                    </div>
+                  </td>
+                  <td width="6%">Asbestos</td>
+                  <div *ngIf=AsbestosFlag>
+                    <td><input type="checkbox" name="checkbox" id="checkbox" [checked]=this.Asbestos disabled />
+                      <label for="checkbox"></label></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox2" id="checkbox2" disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="asbestosComments" id="asbestosComments" size="60" class="form-control"
+                        value="{{this.AsbestosComment}}" readonly title="{{this.AsbestosComment}}" /></td>
+                  </div>
+                  <div *ngIf=!AsbestosFlag>
+                    <td><input type="checkbox" name="checkbox" id="checkbox" disabled />
+                      <label for="checkbox"></label></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox2" id="checkbox2" [checked]=this.Asbestos disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="asbestosComments" id="asbestosComments" size="60" class="form-control"
+                        value="{{this.AsbestosComment}}" readonly title="{{this.AsbestosComment}}" /></td>
+                  </div>
+                </tr>
+                <tr style="border:1px solid #ccc;">
+
+                  <td>Lead</td>
+                  <div *ngIf=LeadFlag>
+                    <td><input type="checkbox" name="checkbox3" id="checkbox3" [checked]=this.Lead disabled /></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox6" id="checkbox6" disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="leadComments" id="leadComments" size="60" class="form-control"
+                        value="{{this.LeadComment}}" readonly title="{{this.LeadComment}}" /></td>
+                  </div>
+                  <div *ngIf=!LeadFlag>
+                    <td><input type="checkbox" name="checkbox3" id="checkbox3" disabled /></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox6" id="checkbox6" [checked]=this.Lead disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="leadComments" id="leadComments" size="60" class="form-control"
+                        value="{{this.LeadComment}}" readonly title="{{this.LeadComment}}" /></td>
+                  </div>
+                </tr>
+                <tr style="border:1px solid #ccc;">
+                  <td>Norm</td>
+                  <div *ngIf=NormFlag>
+                    <td><input type="checkbox" name="checkbox4" id="checkbox4" [checked]=this.Norm disabled /></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox7" id="checkbox7" disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="normComments" id="normComments" size="60" class="form-control"
+                        value="{{this.NormComment}}" readonly title="{{this.NormComment}}" /></td>
+                  </div>
+                  <div *ngIf=!NormFlag>
+                    <td><input type="checkbox" name="checkbox4" id="checkbox4" disabled /></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox7" id="checkbox7" [checked]=this.Norm disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="normComments" id="normComments" size="60" class="form-control"
+                        value="{{this.NormComment}}" readonly title="{{this.NormComment}}" /></td>
+                  </div>
+                </tr>
+                <tr style="border:1px solid #ccc;">
+                  <td>Other</td>
+                  <div *ngIf=OtherFlag>
+                    <td><input type="checkbox" name="checkbox5" id="checkbox5" [checked]=this.Other disabled />
+                    </td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox8" id="checkbox8" disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="otherComments" id="otherComments" size="60" class="form-control"
+                        value="{{this.OtherComment}}" readonly title="{{this.OtherComment}}" /></td>
+                  </div>
+                  <div *ngIf=!OtherFlag>
+                    <td><input type="checkbox" name="checkbox5" id="checkbox5" disabled /></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox8" id="checkbox8" [checked]=this.Other disabled />
+                    </td>
+                    <td>No</td>
+                    <td><input type="text" name="otherComments" id="otherComments" size="60" class="form-control"
+                        value="{{this.OtherComment}}" readonly title="{{this.OtherComment}}" /></td>
+                  </div>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+
+
+          <div class="pane2">
+            <div class="table-responsive">
+              <form [formGroup]="descriptionForm">
+                <table width="100%" border="1" class="fixedsecond">
+                  <thead>
+                    <tr>
+                      <th width="40%">
+                        <p style="font-weight:bold ;color:#000;">Description (Include S/N. Manufacture for detailed
+                          equipment)</p>
+                      </th>
+
+
+                      <th align="center" colspan="3">
+                        <p style="font-weight:bold ;color:#000;">QUANTITY / UNIT OF MEASURE</p>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>&nbsp;</th>
+                      <th>
+                        <p style="font-weight:bold ;color:#000;">#Joints </p>
+                      </th>
+                      <th>
+                        <p style="font-weight:bold ;color:#000;">Footage </p>
+                      </th>
+                      <th>
+                        <p style="font-weight:bold ;color:#000;">Each. </p>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody style="height:80px; overflow-y:scroll;">
+                    <tr *ngFor="let description of equipDescription"
+                      style=" display:table;width:100%;table-layout:fixed;">
+                      <td width="40%"><input type="text" name="Description" id="Description" class="form-control"
+                          formControlName="Description" value="{{description.Description}}" readonly
+                          title="{{description.Description}}" /></td>
+                      <td><input type="text" name="Joints" id="Joints" class="form-control" formControlName="Joints"
+                          value="{{description.Joints}}" readonly title="{{description.Joints}}" /></td>
+                      <td><input type="text" name="Footage" id="Footage" class="form-control" formControlName="Footage"
+                          value="{{description.Footage}}" readonly title="{{description.Footage}}" /></td>
+                      <td><input type="text" name="Each" id="Each" class="form-control" formControlName="Each"
+                          value="{{description.Each}}" readonly title="{{description.Each}}" /></td>
+                    </tr>
+                  </tbody>
+                  <tbody style="height:30px !important; display:table;">
+                    <tr style=" display:table;width:100%;height:30px;table-layout:fixed;">
+                      <td colspan="4">
+                        <p>Load- Out Instructions</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </form>
+            </div>
+          </div>
+
+
+          <div class="pane">
+            <div class="table-responsive">
+              <table width="100%" border="0">
+
+                <tr>
+                  <td valign="top">
+                    <span style="font-size:14px;">
+                      There won't be a pre-scheduled walk-thru for this material</span>
+                    <ul style="color:#F00; font-size:10px;">
+                      <li>SCRAP BUYER TO PROVIDE SHEAR BINS AND ALL LABOR TO LOAD</li>
+                      <li>BUYER TO REMOVE SCRAP MATERIAL @ 18G YARDS AS SITE CONTACT INDICATES</li>
+                      <li>Trucks to be weighed light and heavy at CRC Scale Gate 4
+
+                        </li>
+
+                    </ul>
+
+                    <p>SELLER reserves the right to reject any or all bids. Only the successful bidder will be notified
+                      of
+                      awards. Payment is by Cashier's Check or Wire Transfer and due upon receipt of notification of
+                      award.
+                      All
+                      sales will be charged sales tax unless payment for material is accompanied by resale tax exemption
+                      certificate.</p><br />
+                    <p> Equipment to be removed from property within twenty one (21) days after award at the
+                      buyer&rsquo;s
+                      expense. Seller description of material is based on the best available information, seller
+                      provides no
+                      express warranties and/or guarantees as to the quantity, quality, and/or fitness for any use or
+                      purpose.</p>
+                    <form [formGroup]="pointOfContactForm">
+                      <p style="font-weight:bold ;color:#000;">Bid close date:
+                        <span> <input name="BidCloseDate" type="text" id="textfield15" value="{{this.BidCloseDate }}"
+                            class="form-control" style="width:80%;" formControlName="BidCloseDate" readonly /></span>
+                        2:00 PM Central Time (only
+                        successful bidder will be notified) </p>
+                      <p style="font-weight:bold ;color:#000;">All questions concerning this bid package should be
+                        directed to:<span> <input name="textfield15" type="text" id="FieldContact"
+                            value="{{this.FieldContact}}" style="width:80%;" class="form-control"
+                            formControlName="FieldContact" readonly /></span></p>
+
+                    </form>
+
+
+                  </td>
+                  <td>
+                    <span style="color:#F00; font-size:10px;">
+                      NOTES: 1.There will be a CRC representative present at every load-out<br />
+                      <span style="margin-left:38px;"> 2.Insurance requirements are on attachment A and must be met for
+                        bid offer to be considered</span>
+                    </span>
+                    <ul style="color:#F00; font-size:10px;">
+                      <li>You may contact the site 24 hours in advance to coordinate a viewing if desired</li>
+                      <li>Required personal protective equipment: Hard hat,FRC;s, steel-toe boot,gloves,&safety glasses W/side
+                        shields</li>
+                    </ul>
+                    <form [formGroup]="VendorDetailsForm">
+                      <table width="450" border="1">
+                        <tr>
+                          <td width="30%" style="font-weight:bold ;">Company</td>
+                          <td><label for="textfield15"></label>
+                            <input name="companyName" type="text" id="companyName" style="width:100%"
+                              class="form-control" formControlName="companyName" value="{{this.companyName }}"
+                              readonly />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;"> Vendor Name</td>
+                          <td><input name="vendorContactName" type="text" id="vendorContactName" style="width:100%"
+                              class="form-control" formControlName="vendorContactName"
+                              value="{{this.vendorContactName}}" readonly /></td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">Vendor TIN</td>
+                          <td><input name="vendorTIN" type="text" id="vendorTIN" style="width:100%" class="form-control"
+                              formControlName="vendorTIN" value="{{this.vendorTIN}}" readonly /></td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">Street Address</td>
+                          <td><input name="companyStreetAddress" type="text" id="companyStreetAddress"
+                              style="width:100%" class="form-control" formControlName="companyStreetAddress"
+                              value="{{this.companyStreetAddress}}" readonly />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">State</td>
+                          <td><input name="companyState" type="text" id="companyState" style="width:100%"
+                              class="form-control" formControlName="companyState" value="{{this.companyState}}"
+                              readonly /></td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">City</td>
+                          <td><input name="companyCity" type="text" id="companyCity" style="width:100%"
+                              class="form-control" formControlName="companyCity" value="{{this.companyCity}}"
+                              readonly /></td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">Zip</td>
+                          <td><input name="companyZip" type="text" id="companyZip" style="width:100%"
+                              class="form-control" formControlName="companyZip" value="{{this.companyZip}}" readonly />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">Email</td>
+                          <td><input name="vendorEmail" type="text" id="vendorEmail" style="width:100%"
+                              class="form-control" formControlName="vendorEmail" value="{{this.vendorEmail}}"
+                              readonly /></td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">Phone</td>
+                          <td><input name="vendorPhone" type="text" id="vendorPhone" style="width:100%"
+                              class="form-control" formControlName="vendorPhone" value="{{this.vendorPhone}}"
+                              readonly /></td>
+                        </tr>
+                      </table>
+                    </form>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div *ngIf="customerBidError" class="alert alert-danger" role="alert">
+                      <strong>Error:</strong> CustomerBid cannot be empty or negative
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+
+
+
+
+
+        </div>
+
+
+
+      </div>
+      <div class="modal-footer" >
+
+        <button type="button" class="btns" style="margin: auto" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<!--BidForm View  Modal -->
+<div id="BidFormUpdateModal" class="modal fade" role="dialog">
+  <div class="modal-dialog" style="max-width:80% !important">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+
+      <div class="modal-body">
+
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+        <div align="left" style="text-align:left;" class="headder">
+          <h5>Bid Offer</h5>
+        </div>
+
+        <div style="width:100%; margin:0 auto;">
+          <div class="pane" *ngIf="this.errorMessageInBidForm == true">
+            <span style="color:#F00;"><strong>ERROR: </strong>{{this.message}}</span>
+          </div>
+
+          <div class="pane">
+            <div class="table-responsive">
+              <form [formGroup]="customerBidForm">
+                <table width="1000" border="0" cellpadding="0" cellspacing="0">
+
+                  <tr>
+                    <th>Org</th>
+                    <td>
+                      <input type="text" name="OrgEdit" id="OrgEdit" style="width:130px;" class="form-control"
+                        formControlName="orgName" readonly /></td>
+                    <th>Case #</th>
+                    <td><input type="text" name="CaseEdit" id="CaseEdit" style="width:130px;" class="form-control"
+                        formControlName="case" readonly /></td>
+                    <th>Pic/Docs</th>
+
+                    <th style="color:#F00;">Customer Bid</th>
+                    <td><input type="text" name="CustomerBid" id="customerBidValue" placeholder="0" class="form-control"
+                        style="width:130px;" formControlName="customerBid" /></td>
+                    <th>UOM</th>
+                    <td><input type="text" name="UomEdit" id="UomEdit" style="width:130px;" class="form-control"
+                        formControlName="uom" readonly /></td>
+                  </tr>
+                  <tr>
+                    <td colspan="7"></td>
+                    <!-- <th><span>Highest Bid</span></th>
+                    <td><input type="text" name="HighestBid" id="HighestBid" style="width:130px;" class="form-control"
+                        formControlName="HighestBid" readonly /></td> -->
+                    <th>Customer #</th>
+                    <td><input type="text" name="CustomerNo" id="CustomerNo" style="width:130px;" class="form-control"
+                        formControlName="customerNo" readonly /></td>
+
+                  </tr>
+                </table>
+              </form>
+            </div>
+          </div>
+
+          <div class="pane2">
+              <div class="table-responsive">
+                <div class="tableFixHead" style="width: 65%">
+                  <form [formGroup]="LLLForm">
+                    <table>
+                      <thead style="background:#eee;">
+                        <tr>
+                          <th>
+                            Location
+                          </th>
+                          <th>
+                            Latitude
+                          </th>
+                          <th>
+                            Longitude
+                          </th>
+                        </tr>
+                      </thead>
+                     
+                      <tbody  style=" overflow-x: hidden;">
+                        <tr *ngFor="let llls of locationDetails">
+                          <td><input type="text" name="location" id="location" class="form-control"
+                              formControlName="location" value="{{llls.Location}}" readonly title="{{llls.Location}}" />
+                          </td>
+                          <td><input type="text" name="Lat" id="Lat" class="form-control" formControlName="Lat"
+                              value="{{llls.Lat}}" readonly title="{{llls.Lat}}" /></td>
+                          <td><input type="text" name="Long" id="Long" class="form-control" formControlName="Long"
+                              value="{{llls.Long}}" readonly title="{{llls.Long}}" /></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+          <div class="pane">
+            <p style="font-weight:bold ;color:#000;">ENVIRONMENTAL CONDITIONS</p>
+            <div class="table-responsive">
+              <table width="99%" border="0">
+                <tr style="border:1px solid #ccc;">
+                  <td colspan="2" rowspan="4" valign="top">
+                    <div style="width:400px;">
+                      <p>Are any of the following materials known
+                        or suspected to be contained
+                        in the equipment described
+                        above?
+                        If yes(Y), please comment</p>
+                    </div>
+                  </td>
+                  <td width="6%">Asbestos</td>
+                  <div *ngIf=AsbestosFlag>
+                    <td><input type="checkbox" name="checkbox" id="checkbox" [checked]=this.Asbestos disabled />
+                      <label for="checkbox"></label></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox2" id="checkbox2" disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="asbestosComments" id="asbestosComments" size="60" class="form-control"
+                        value="{{this.AsbestosComment}}" readonly title="{{this.AsbestosComment}}" /></td>
+                  </div>
+                  <div *ngIf=!AsbestosFlag>
+                    <td><input type="checkbox" name="checkbox" id="checkbox" disabled />
+                      <label for="checkbox"></label></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox2" id="checkbox2" [checked]=this.Asbestos disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="asbestosComments" id="asbestosComments" size="60" class="form-control"
+                        value="{{this.AsbestosComment}}" readonly title="{{this.AsbestosComment}}" /></td>
+                  </div>
+                </tr>
+                <tr style="border:1px solid #ccc;">
+
+                  <td>Lead</td>
+                  <div *ngIf=LeadFlag>
+                    <td><input type="checkbox" name="checkbox3" id="checkbox3" [checked]=this.Lead disabled /></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox6" id="checkbox6" disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="leadComments" id="leadComments" size="60" class="form-control"
+                        value="{{this.LeadComment}}" readonly title="{{this.LeadComment}}" /></td>
+                  </div>
+                  <div *ngIf=!LeadFlag>
+                    <td><input type="checkbox" name="checkbox3" id="checkbox3" disabled /></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox6" id="checkbox6" [checked]=this.Lead disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="leadComments" id="leadComments" size="60" class="form-control"
+                        value="{{this.LeadComment}}" readonly title="{{this.LeadComment}}" /></td>
+                  </div>
+                </tr>
+                <tr style="border:1px solid #ccc;">
+                  <td>Norm</td>
+                  <div *ngIf=NormFlag>
+                    <td><input type="checkbox" name="checkbox4" id="checkbox4" [checked]=this.Norm disabled /></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox7" id="checkbox7" disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="normComments" id="normComments" size="60" class="form-control"
+                        value="{{this.NormComment}}" readonly title="{{this.NormComment}}" /></td>
+                  </div>
+                  <div *ngIf=!NormFlag>
+                    <td><input type="checkbox" name="checkbox4" id="checkbox4" disabled /></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox7" id="checkbox7" [checked]=this.Norm disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="normComments" id="normComments" size="60" class="form-control"
+                        value="{{this.NormComment}}" readonly title="{{this.NormComment}}" /></td>
+                  </div>
+                </tr>
+                <tr style="border:1px solid #ccc;">
+                  <td>Other</td>
+                  <div *ngIf=OtherFlag>
+                    <td><input type="checkbox" name="checkbox5" id="checkbox5" [checked]=this.Other disabled />
+                    </td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox8" id="checkbox8" disabled /></td>
+                    <td>No</td>
+                    <td><input type="text" name="otherComments" id="otherComments" size="60" class="form-control"
+                        value="{{this.OtherComment}}" readonly title="{{this.OtherComment}}" /></td>
+                  </div>
+                  <div *ngIf=!OtherFlag>
+                    <td><input type="checkbox" name="checkbox5" id="checkbox5" disabled /></td>
+                    <td>Yes</td>
+                    <td><input type="checkbox" name="checkbox8" id="checkbox8" [checked]=this.Other disabled />
+                    </td>
+                    <td>No</td>
+                    <td><input type="text" name="otherComments" id="otherComments" size="60" class="form-control"
+                        value="{{this.OtherComment}}" readonly title="{{this.OtherComment}}" /></td>
+                  </div>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+
+
+          <div class="pane2">
+            <div class="table-responsive">
+              <form [formGroup]="descriptionForm">
+                <table width="100%" border="1" class="fixedsecond">
+                  <thead>
+                    <tr>
+                      <th width="40%">
+                        <p style="font-weight:bold ;color:#000;">Description (Include S/N. Manufacture for detailed
+                          equipment)</p>
+                      </th>
+
+
+                      <th align="center" colspan="3">
+                        <p style="font-weight:bold ;color:#000;">QUANTITY / UNIT OF MEASURE</p>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>&nbsp;</th>
+                      <th>
+                        <p style="font-weight:bold ;color:#000;">#Joints </p>
+                      </th>
+                      <th>
+                        <p style="font-weight:bold ;color:#000;">Footage </p>
+                      </th>
+                      <th>
+                        <p style="font-weight:bold ;color:#000;">Each. </p>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody style="height:80px; overflow-y:scroll;">
+                    <tr *ngFor="let description of equipDescription"
+                      style=" display:table;width:100%;table-layout:fixed;">
+                      <td width="40%"><input type="text" name="Description" id="Description" class="form-control"
+                          formControlName="Description" value="{{description.Description}}" readonly /></td>
+                      <td><input type="text" name="Joints" id="Joints" class="form-control" formControlName="Joints"
+                          value="{{description.Joints}}" readonly /></td>
+                      <td><input type="text" name="Footage" id="Footage" class="form-control" formControlName="Footage"
+                          value="{{description.Footage}}" readonly /></td>
+                      <td><input type="text" name="Each" id="Each" class="form-control" formControlName="Each"
+                          value="{{description.Each}}" readonly title="{{description.Each}}" /></td>
+                    </tr>
+                  </tbody>
+                  <tbody style="height:30px !important; display:table;">
+                    <tr style=" display:table;width:100%;height:30px;table-layout:fixed;">
+                      <td colspan="4">
+                        <p>Load- Out Instructions</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </form>
+            </div>
+          </div>
+
+
+          <div class="pane">
+            <div class="table-responsive">
+              <table width="100%" border="0">
+
+                <tr>
+                  <td valign="top">
+                    <span style="font-size:14px;">
+                      There won't be a pre-scheduled walk-thru for this material</span>
+                    <ul style="color:#F00; font-size:10px;">
+                      <li>SCRAP BUYER TO PROVIDE SHEAR BINS AND ALL LABOR TO LOAD</li>
+                      <li>BUYER TO REMOVE SCRAP MATERIAL @ 18G YARDS AS SITE CONTACT INDICATES</li>
+                      <li>Trucks to be weighed light and heavy at CRC Scale Gate 4
+
+                        </li>
+
+                    </ul>
+
+                    <p>SELLER reserves the right to reject any or all bids. Only the successful bidder will be notified
+                      of
+                      awards. Payment is by Cashier's Check or Wire Transfer and due upon receipt of notification of
+                      award.
+                      All
+                      sales will be charged sales tax unless payment for material is accompanied by resale tax exemption
+                      certificate.</p><br />
+                    <p> Equipment to be removed from property within twenty one (21) days after award at the
+                      buyer&rsquo;s
+                      expense. Seller description of material is based on the best available information, seller
+                      provides no
+                      express warranties and/or guarantees as to the quantity, quality, and/or fitness for any use or
+                      purpose.</p>
+                    <form [formGroup]="pointOfContactForm">
+                      <p style="font-weight:bold ;color:#000;">Bid close date:
+                        <span> <input name="BidCloseDate" type="text" id="textfield15" value="{{this.BidCloseDate }}"
+                            class="form-control" style="width:80%;" formControlName="BidCloseDate" readonly /></span>
+                        2:00 PM Central Time (only
+                        successful bidder will be notified) </p>
+                      <p style="font-weight:bold ;color:#000;">All questions concerning this bid package should be
+                        directed to:<span> <input name="textfield15" type="text" id="FieldContact"
+                            value="{{this.FieldContact}}" style="width:80%;" class="form-control"
+                            formControlName="FieldContact" readonly /></span></p>
+
+                    </form>
+
+
+                  </td>
+                  <td>
+                    <span style="color:#F00; font-size:10px;">
+                      NOTES: 1.There will be a CRC representative present at every load-out<br />
+                      <span style="margin-left:38px;"> 2.Insurance requirements are on attachment A and must be met for
+                        bid offer to be considered</span>
+                    </span>
+                    <ul style="color:#F00; font-size:10px;">
+                      <li>You may contact the site 24 hours in advance to coordinate a viewing if desired</li>
+                      <li>Required personal protective equipment: Hard hat,FRC;s, steel-toe boot,gloves,&safety glasses W/side
+                        shields</li>
+                    </ul>
+                    <form [formGroup]="VendorDetailsForm">
+                      <table width="450" border="1">
+                        <tr>
+                          <td width="30%" style="font-weight:bold ;">Company</td>
+                          <td><label for="textfield15"></label>
+                            <input name="companyName" type="text" id="companyName" style="width:100%"
+                              class="form-control" formControlName="companyName" value="{{this.companyName }}"
+                              readonly />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;"> Vendor Name</td>
+                          <td><input name="vendorContactName" type="text" id="vendorContactName" style="width:100%"
+                              class="form-control" formControlName="vendorContactName"
+                              value="{{this.vendorContactName}}" readonly /></td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">Vendor TIN</td>
+                          <td><input name="vendorTIN" type="text" id="vendorTIN" style="width:100%" class="form-control"
+                              formControlName="vendorTIN" value="{{this.vendorTIN}}" readonly /></td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">Street Address</td>
+                          <td><input name="companyStreetAddress" type="text" id="companyStreetAddress"
+                              style="width:100%" class="form-control" formControlName="companyStreetAddress"
+                              value="{{this.companyStreetAddress}}" readonly />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">State</td>
+                          <td><input name="companyState" type="text" id="companyState" style="width:100%"
+                              class="form-control" formControlName="companyState" value="{{this.companyState}}"
+                              readonly /></td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">City</td>
+                          <td><input name="companyCity" type="text" id="companyCity" style="width:100%"
+                              class="form-control" formControlName="companyCity" value="{{this.companyCity}}"
+                              readonly /></td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">Zip</td>
+                          <td><input name="companyZip" type="text" id="companyZip" style="width:100%"
+                              class="form-control" formControlName="companyZip" value="{{this.companyZip}}" readonly />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">Email</td>
+                          <td><input name="vendorEmail" type="text" id="vendorEmail" style="width:100%"
+                              class="form-control" formControlName="vendorEmail" value="{{this.vendorEmail}}"
+                              readonly /></td>
+                        </tr>
+                        <tr>
+                          <td style="font-weight:bold ;">Phone</td>
+                          <td><input name="vendorPhone" type="text" id="vendorPhone" style="width:100%"
+                              class="form-control" formControlName="vendorPhone" value="{{this.vendorPhone}}"
+                              readonly /></td>
+                        </tr>
+                      </table>
+                    </form>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div *ngIf="customerBidError" class="alert alert-danger" role="alert">
+                      <strong>Error:</strong> {{this.message}}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+
+
+
+
+
+        </div>
+
+
+
+      </div>
+      <div class="modal-footer" style="margin: auto">
+        <button type="button" class="btns" [disabled]="errorMessageInBidForm"
+          (click)="updateBidOffer(customerBidForm)">Submit</button>
+        <button type="button" class="btns" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+<div class="modal fade" id="ShowSuccessModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+
+
+      <div class="modal-body">
+        <div>
+          <h2>Offer updated successfully</h2>
+          <h2>Confirmation Code: {{this.bidOfferConfirmation}}</h2>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" ngbAutofocus class="btns" (click)='this.closeModal()' data-dismiss="modal">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal modal-child" data-backdrop-limit="1" id="ShowPicsModal" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel" aria-hidden="true" data-modal-parent="#BidFormViewModal">
+  <div class="modal-dialog modal-lg" style="max-width:80% !important">
+    <div class="modal-content">
+
+
+      <div class="modal-body">
+
+          <div *ngIf="noFiles">
+              No files
+            </div>
+            <div *ngIf="getDocumentError" class="alert alert-danger" role="alert">
+              <strong>Error:</strong> {{this.message}}
+            </div>
+
+        <div *ngIf="noFiles == false && getDocumentError == false" >
+          <div align="left" style="text-align:center;" class="headder">
+            <h5>Documents</h5>
+          </div>
+          <div>
+            <table class="table">
+              <thead class="thead-light">
+                <tr>
+                  <th class="textalign">File Name</th>
+                  <th class="textalign">Description</th>
+                  <th class="textalign">File Type</th>
+                  <th class="textalign">Size</th>
+                  <th class="textalign">Actions</th>
+                  <!--<th class="textalign">Download</th>-->
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let documentDetails of responseForGetDocumentDetails">
+                  <td class="textalign">{{documentDetails.attName}}</td>
+                  <td class="textalign">{{documentDetails.attDesc}}</td>
+                  <td class="textalign">{{documentDetails.attMimeType}}</td>
+                  <td class="textalign">{{documentDetails.attSize}}</td>
+                  <td class="textalign"><button type="button" (click)="getImageFromService(documentDetails.attId)"
+                      ngbAutofocus class="btns">View</button>&nbsp;&nbsp;<button type="button"
+                      (click)="downloadDocument(documentDetails.attId)" ngbAutofocus class="btns">Download</button>
+                  </td>
+
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div *ngIf="downloadDocumentError">
+            <strong>Error:</strong> {{this.message}}
+        </div>
+        <div *ngIf="viewDocumentError">
+            <strong>Error:</strong> {{this.message}}
+        </div>
+
+        <div align="center">
+          <!--<img [src]="imagePath"><br><br>-->
+          <button type="button" ngbAutofocus class="btns" data-dismiss="modal">Close</button>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

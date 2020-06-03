@@ -1,0 +1,113 @@
+/* @import 'https://fonts.googleapis.com/icon?family=Material+Icons';
+*/
+/* @import "~material-icons/iconfont/material-icons.css"; */
+
+/*
+    DEMO STYLE
+*/
+
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import "https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i,900,900i";
+body {
+  font-family: "Lato", sans-serif;
+  background: #fafafa;
+}
+
+.material-icons {
+  font-family: "Material Icons" !important;
+}
+
+#refreshbutton {
+  background: url("images/refresh.png") no-repeat center;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  padding-left: 50px;
+  padding-bottom: 3px;
+  color: #fff;
+  text-decoration: none;
+}
+
+p {
+  /* font-family: 'Lato', sans-serif; */
+  font-size: 1em;
+  font-weight: 300;
+  line-height: 1.7em;
+  color: #999;
+}
+
+a,
+a:hover,
+a:focus {
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.navbar {
+  padding: 15px 10px;
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  margin-bottom: 40px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-btn {
+  box-shadow: none;
+  outline: none !important;
+  border: none;
+}
+
+.line {
+  width: 100%;
+  height: 1px;
+  border-bottom: 1px dashed #ddd;
+  margin: 40px 0;
+}
+
+i,
+span {
+  display: inline-block;
+}
+
+.btns {
+  color: #fff;
+  padding: 5px 10px;
+  text-decoration: none;
+  border-radius: 5px;
+  background-color: #0071bb;
+  border: 2px solid #044672;
+}
+
+.btns:hover {
+  color: #fff;
+  background-color: #0f87d6;
+  border-color: #044672;
+}
+
+.bg-light {
+  background-color: #2684c0 !important;
+  width: 100%;
+  height: 92px;
+}
+
+.navbar-light .navbar-nav .nav-link {
+  color: #fff !important;
+}
+
+.maintb_fixed tbody {
+  display: block;
+  height: 350px !important;
+  overflow: auto;
+}
+
+.maintb_fixed thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.maintb_fixed thead {
+  width: calc(100% - 1em);
+}

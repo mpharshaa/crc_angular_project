@@ -1,0 +1,84 @@
+<div class="contentpart2">
+  <div class="loginpanel">
+
+    <!--For Loading after entering Credentials-->
+    <ng-template #customLoadingTemplate>
+      <div class="custom-class">
+        <h3>
+          {{this.loadingText}}
+        </h3>
+      </div>
+    </ng-template>
+
+    <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }" [template]="customLoadingTemplate">
+    </ngx-loading>
+
+
+
+
+    <!--Login Form Code-->
+    
+
+    <form [formGroup]="loginForm" (ngSubmit)=OnSubmitLogin()>
+      <table width="100%" border="0">
+        <tr> <td align="center"><img src="assets/images/logo_CRC.png" width="200" />
+        </td></tr>
+        <tr>
+          <td colspan="2" height="50" style="text-align: center "><span class="logintitle" style="color:#2684c0;">{{this.loginHeading}}</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td height="30" colspan="2" style="color:#2684c0">Email Address</td>
+        </tr>
+        <tr>
+          <td>
+            <input type="text" formControlName="userId" class="form-control">
+          </td>
+
+        </tr>
+        <tr>
+          <div *ngIf="submitted && loginFormControl.userId.invalid ">
+            <div *ngIf="loginFormControl.userId.errors.required">
+              <font color="red">{{this.userNameError}}</font>
+            </div>
+          </div>
+        </tr>
+        <tr>
+          <td height="20" colspan="2" style="color:#2684c0">Password</td>
+        </tr>
+        <tr>
+          <td>
+            <input type="password"  formControlName="password" class="form-control">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div *ngIf="submitted && loginFormControl.password.invalid">
+              <div *ngIf="loginFormControl.password.errors.required">
+                <font color="red">{{this.passwordError}}</font>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>&nbsp;
+            <div *ngIf="wrongCredentials" class="alert alert-danger" role="alert">
+              <strong>Error:</strong> {{errorMessage}}
+            </div>
+          </td>
+        </tr>
+        <tr >
+          <div style="text-align: center !important">
+          <td valign="top" ><button type="submit" class="btns">Login</button> &nbsp;
+            <button type="button" class="btns" (click)=reset()>Reset</button>
+          </td>
+        </div>
+        </tr>
+      </table>
+
+    </form>
+
+
+  </div>
+</div>

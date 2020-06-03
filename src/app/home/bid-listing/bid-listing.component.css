@@ -1,0 +1,180 @@
+table {
+    width: 80%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-width: 500px;
+}
+th.mat-header-cell {
+  text-align: center !important;
+  max-width: 300px;
+}
+
+
+
+/* ---------------------------------------------------
+    BIDFORM CSS
+----------------------------------------------------- */  
+
+.pane {
+	background: #eaf2fc;
+	border: 1px solid #ccc;
+	padding: 5px;
+	margin: 5px auto;
+}
+
+pane table {
+	font-weight: bold;
+	padding: 5px;
+}
+
+.pane th {
+	border: none;
+	font-weight: bold;
+	text-align: left;
+	padding: 5px;
+}
+
+.pane td {
+	border: none;
+	padding: 5px;
+}
+
+.pane .input {
+	border: 1px solid #999;
+	padding: 5px;
+	min-width: 108px;
+	background: #fff;
+}
+
+.pane .input1 {
+	border: 1px solid #999;
+	background: #fff;
+	padding: 5px;
+	min-width: 120px;
+}
+
+.pane .input2 {
+	border: 1px solid #999;
+	padding: 5px;
+	width: 72px;
+}
+
+.pane select {
+	border: 1px solid #999;
+	width: 108px;
+	background: #fff;
+	padding: 3px;
+}
+
+.pane2 {
+	background: #eaf2fc;
+	border: 1px solid #ccc;
+	padding: 5px;
+	margin: 5px auto;
+}
+
+.pane2 table {
+	border: none;
+	padding: 5px;
+}
+
+.pane2 th {
+	border: 1px solid #ccc;
+	font-weight: bold;
+	text-align: left;
+	padding: 5px;
+}
+
+.pane2 td {
+	border: 1px solid #ccc;
+	padding: 5px;
+}
+
+.pane2 .input {
+	border: 1px solid #999;
+	padding: 5px;
+	min-width: 108px;
+	background: #fff;
+}
+
+.pane2 .input1 {
+	border: 1px solid #999;
+	background: #fff;
+	padding: 5px;
+	min-width: 120px;
+}
+
+.pane2 .input2 {
+	border: 1px solid #999;
+	padding: 5px;
+	width: 72px;
+}
+
+.pane2 select {
+	border: 1px solid #999;
+	width: 188px;
+	background: #fff;
+	padding: 3px;
+}
+
+.headder {
+	background:#0071bb;
+	width: 100%;
+	border-bottom: 1px solid #ccc;
+	padding: 10px;
+	margin: 0px;
+	font-size: 12px;
+	color: #fff;
+	font-weight: bold;
+}
+
+.fixed tbody {
+    display:block;
+    height:150px !important;
+	overflow:auto ;
+	width:60%;
+}
+.fixed thead {
+    display:table;
+    width:58% !important;
+    table-layout:fixed;
+}
+
+.fixed thead {
+    width: calc( 100% - 1em )
+}
+.fixedsecond tbody {
+    display:block;
+    height:240px !important;
+	overflow:auto ;
+}
+.fixedsecond thead {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+}
+.fixedsecond thead {
+    width: calc( 100% - 1em )
+}
+.textalign{text-align: left !important;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Fix table head */
+.tableFixHead    { overflow-y: auto; height: 200px; }
+.tableFixHead thead, th { position: sticky; top: 0; }
+
+/* Just common table stuff. */
+table  { border-collapse: collapse; width: 100%; }
+th, td { padding: 8px 16px; }
+

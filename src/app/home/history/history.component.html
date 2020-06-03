@@ -1,0 +1,185 @@
+<div align="center">
+  <h3 style="color:#2684c0;">History</h3><br>
+  <div>
+    <form [formGroup]="rangeSelectForm">
+      <mat-form-field>
+        <mat-label>Range</mat-label>
+        <mat-select disableRipple formControlName="dropdown" (selectionChange)="selectOnchange($event)">
+          <mat-option value="30days">Last 30 days</mat-option>
+          <mat-option value="90days">Last 90 days</mat-option>
+          <mat-option value="custom">Custom</mat-option>
+        </mat-select>
+      </mat-form-field>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <mat-form-field>
+        <input matInput readonly [matDatepicker]="startDate" formControlName="startDate" [max]="tomorrow"
+          placeholder="Start Date" disabled="{{disabled}}">
+        <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
+        <mat-datepicker #startDate></mat-datepicker>
+      </mat-form-field>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <mat-form-field>
+        <input matInput readonly [matDatepicker]="endDate" placeholder="End Date" [max]="tomorrow"
+          formControlName="endDate" disabled="{{disabled}}">
+        <mat-datepicker-toggle matSuffix [for]="endDate"></mat-datepicker-toggle>
+        <mat-datepicker #endDate></mat-datepicker>
+      </mat-form-field>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+      <button mat-raised-button (click)="getRangeData(rangeSelectForm)" style="color:#2684c0;">
+        <mat-icon>search</mat-icon>
+      </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <button mat-raised-button (click)="reset()" style="color:#2684c0;">
+        <mat-icon>autorenew</mat-icon>
+      </button>
+    </form>
+  </div>
+</div>
+
+
+
+<div class="table-responsive text-center"
+  *ngIf="this.responseData && emptyDropDownError==false && noRecordeFound ==false && resetTable == false && dateFormatError ==false && dateEmptyError ==false &&historyerror && greaterDateError ==false">
+
+  <div class="mat-elevation-z8" *ngIf="dataSource?.filteredData.length > 0" style="margin:20px auto;width:85%;">
+
+
+
+
+
+
+
+
+
+
+
+
+    <table mat-table [dataSource]="dataSource" matSort matSortActive="transactionTimestamp" matSortDirection="desc"
+      matSortDisableClear>
+      <ng-container matColumnDef="transactionType">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header><strong>Transaction Type</strong></th>
+        <td mat-cell *matCellDef="let history" style="text-align: left !important" title="{{history.transactionType}}">
+          {{changeTransactionType(history) | async}}{{changedTransactionType}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="transactionId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header><strong>Transaction ID</strong> </th>
+        <td mat-cell *matCellDef="let history" style="text-align: left !important" title="{{history.transactionId}}">
+          <a href="" (click)="getTransactionDetails(history)" data-toggle="modal"
+            data-target="#myModal">{{history.transactionId}}</a>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="transactionTimestamp">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header><strong>Transaction Date</strong></th>
+        <td mat-cell *matCellDef="let history" style="text-align: left !important">
+          {{history.transactionTimestamp | date:"MM/dd/yyyy, h:mm a"}}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let myRowData; columns: displayedColumns"></tr>
+    </table>
+
+
+
+
+
+
+
+
+
+
+    <mat-paginator [pageSize]="15" [pageSizeOptions]="[15,20,50]">
+    </mat-paginator>
+  </div>
+
+</div>
+<div *ngIf="emptyDropDownError ==true" style="text-align: center; color:red">
+  Please select Range
+</div>
+<div *ngIf="dateFormatError == true" style="text-align: center; color:red">
+  Please enter correct date format (mm/dd/yyyy)
+</div>
+<div *ngIf="dateEmptyError ==true" style="text-align: center; color:red">
+  Start Date and End Date are Mandatory
+</div>
+<div *ngIf="greaterDateError ==true" style="text-align: center; color:red">
+
+  Start Date cannot be greater than End Date
+</div>
+<div *ngIf="noRecordeFound ==true" style="text-align: center; color:#2684c0">
+  No Records found
+</div>
+<div *ngIf="historyerror == true" style="text-align: center; color:red">
+  {{this.message}}
+</div>
+<!-- <form class="date-block" [formGroup]="filterForm">
+  <div class="date-block__list">
+    <mat-form-field>
+      <input matInput [matDatepicker]="fromDate" placeholder="From Date" formControlName="fromDate">
+      <mat-datepicker-toggle matSuffix [for]="fromDate"></mat-datepicker-toggle>
+      <mat-datepicker #fromDate></mat-datepicker>
+    </mat-form-field>
+  </div>
+  <div class="date-block__list">
+    <mat-form-field>
+      <input matInput [matDatepicker]="toDate" placeholder="To Date" formControlName="toDate">
+      <mat-datepicker-toggle matSuffix [for]="toDate"></mat-datepicker-toggle>
+      <mat-datepicker #toDate></mat-datepicker>
+    </mat-form-field>
+  </div>
+  <button mat-button color="primary" class="primary" (click)="applyFilter()">Submit</button>
+</form>  -->
+
+
+
+
+
+<div class="modal" id="myModal">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div align="left" style="text-align:left;" class="headder">
+          <h5>{{this.transactionTypee}}</h5>
+        </div>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <div class="table-responsive">
+          <!-- <pre>{{ jsonDataa | json }}</pre>  -->
+          <div *ngIf="this.transactionDetailError == true">
+            {{this.errorMessage}}
+          </div>
+          <div *ngIf="this.transactionDetailError == false">
+            <h6>Transaction Details</h6>
+            <div *ngFor="let item of jsonDataa | keyvalue">
+              <form [formGroup]="transactionDetailsForm">
+                <table>
+                  <tr>
+                    <td style="width:25% !important">{{item.key}}</td>
+
+                    <td><input type="text" name="transactiondetailValue" id="transactiondetailValue" style="width:100%;"
+                        class="form-control" formControlName="transactiondetailValue" value="{{item.value}}"title="{{item.value}}" readonly />
+                    </td>
+                  </tr>
+                </table>
+              </form>
+            </div>
+          </div>
+          <!-- <div *ngFor="let item of jsonDataa | keyvalue">
+              Key: <b>{{item.key}}</b> and Value: <b>{{item.value}}</b>
+          </div> -->
+        </div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btns" style="margin: auto" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>

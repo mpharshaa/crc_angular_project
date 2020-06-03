@@ -1,0 +1,98 @@
+ <!--<ngx-spinner>
+  <p style="font-size: 20px; color: white" align="center">Loading...Please wait</p>
+</ngx-spinner>-->
+<ngx-spinner name="sp2" [fullScreen]="true" type="ball-fussion" size="medium"><p style="font-size: 20px; color: white" align="center">{{this.loadingText}}</p></ngx-spinner>
+
+<div class="wrapper">
+  <!-- Sidebar  -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <h3><img src="assets/images/logo_CRC.png" height="92"></h3>
+      <strong><img src="assets/images/logo-small.png"  height="92"></strong>
+    </div>
+
+
+
+
+    <ul class="list-unstyled components">
+      <li class="active">
+        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="true" class="dropdown-toggle ">
+          <i class="fas fa-gavel"></i>Bids</a>
+        <ul class="list-unstyled active collapse show" id="homeSubmenu">
+          <li>
+            <a href="#" (click)=availableBids()><i class="fas fa-info-circle "></i>Available Bids</a>
+          </li>
+          <li>
+            <a href="#" (click)=myBids()><i class="fas fa-info-circle"></i>My Bids</a>
+          </li>
+
+        </ul>
+      </li>
+      
+
+
+    </ul>
+
+
+
+
+    <ul class="list-unstyled components">
+      <li class="active">
+        <a href="#" (click)=history()><i class="fas fa-info-circle"></i>History</a>
+      </li>
+    </ul>
+
+
+  </nav>
+
+  <!-- Page Content  -->
+  <div id="content" >
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #2684c0!important" >
+      <div  class="container-fluid">
+
+
+        <button type="button" id="sidebarCollapse" class="btn btn-outline-secondary" style="color:#fff">
+          <i class="fas fa-align-left"></i>
+          <span></span>
+        </button>
+        <ul class="navbar-nav w-50 justify-content-center">
+          <li class="nav-item" >
+            <h3 style="color:#fff; text-align: center !important">{{this.homePageHeading}}</h3>
+          </li>
+        </ul><br/>
+        
+
+          <ul class="list-unstyled components">
+
+              <li class="active">
+                  <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"  style="color: #2684c0; background-color:#2684c0 !important"><i style="color: #fff !important"class="fas fa-user"></i></a>
+                  <div class="dropdown-menu dropdown-menu-right">
+
+                      <a class="dropdown-item" href="#"><i class="fas fa-user"></i> {{this.userIdToHTMl}}</a>
+                      <div class="dropdown-divider"></div>
+                      
+                      <a class="dropdown-item" id="passwordbutton" [routerLink]="['/resetPassword']"
+                title="Change Password"> <i class="fas fa-unlock-alt"></i> Change Password</a>
+                <div class="dropdown-divider"></div>
+                      <a class="dropdown-item"  href="#" id="logoutbutton" (click)=logout() title="Logout"> <i
+                        class="fas fa-sign-out-alt"></i> Logout</a>
+                  </div>
+              </li>
+          </ul>
+       
+      </div>
+    </nav>
+<div *ngIf="bidsareavailable">
+  <app-bid-listing></app-bid-listing>
+</div>
+<div *ngIf="myBidsAreAvailable">
+<app-edit-bid-listing></app-edit-bid-listing>
+</div>
+<div *ngIf="displayhistory">
+<app-history></app-history>
+</div>
+  </div>
+
+
+ 
